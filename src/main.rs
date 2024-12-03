@@ -7,6 +7,8 @@ fn main() {
     let start = Instant::now();
     println!("{:?}", day01::run());
     println!("{:?}", day02::run());
+    println!("{:?}", day03::run());
+
 
     let duration = start.elapsed();
     println!("Done! 🎉 -- Elapsed time: {:?}", duration);

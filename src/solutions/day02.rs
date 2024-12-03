@@ -9,6 +9,9 @@ fn is_safe(level: &Vec<i32>) -> bool {
 }
 
 fn safeWR(level: &Vec<i32>) -> bool {
+    if (is_safe(level)) {
+        return true;
+    }
     for i in 0..level.len() {
         let mut clone = level.clone();
         clone.remove(i);
@@ -22,7 +25,7 @@ fn safeWR(level: &Vec<i32>) -> bool {
 }
 
 pub fn run() -> (u32, u32) {
-    let input = std::fs::read_to_string("data/day01.txt").unwrap().trim().replace('\r', "");
+    let input = std::fs::read_to_string("data/day02.txt").unwrap().trim().replace('\r', "");
     let mut a1 = 0;
     let mut a2 = 0;
     for line in input.lines() {
