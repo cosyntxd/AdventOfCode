@@ -1,4 +1,4 @@
-use std::time::Instant;
+use std::{thread, time::Instant};
 
 use solutions::*;
 mod solutions;
@@ -8,8 +8,7 @@ fn main() {
     println!("{:?}", day01::run());
     println!("{:?}", day02::run());
     println!("{:?}", day03::run());
-
-
+    println!("{:?}", day04::run());
     let duration = start.elapsed();
     println!("Done! 🎉 -- Elapsed time: {:?}", duration);
 
