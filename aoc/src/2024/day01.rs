@@ -13,7 +13,7 @@ pub fn run() -> (u32, u32) {
     a.sort();
     b.sort();
 
-    let answer1 = a.into_iter().zip(b).map(|(lhs, rhs)| u32::abs_diff(lhs, rhs)).sum();
+    // let answer1 = a.into_iter().zip(b).map(|(lhs, rhs)| u32::abs_diff(lhs, rhs)).sum();
 
     (answer1, answer2)
 }

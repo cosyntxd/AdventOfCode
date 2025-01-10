@@ -77,6 +77,7 @@ pub fn run() -> (u32, u32) {
                     }
                 }
                 if !bad {
+                    println!("{x} {y}");
                     c2 += 1;
                 }
             }
