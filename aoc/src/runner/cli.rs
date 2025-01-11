@@ -43,6 +43,18 @@ impl Cli {
 
         Self { execution, files }
     }
+    pub fn files_parse(&self) -> &Vec<PathBuf> {
+        let mut good_days = vec![];
+
+        if path.exists() {
+            good_days.push(path);
+        }
+        let name = path.file_name().unwrap_or_default().to_string_lossy();
+        if name.chars().last().unwrap().is_ascii_digit() {
+
+        }
+        &self.files
+    }
     pub fn help_message() -> &'static str {
         todo!()
     }

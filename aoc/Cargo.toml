@@ -4,3 +4,6 @@ version = "1.0.0"
 edition = "2021"
 
 [dependencies]
+rayon = "1.10.0"
+regex = "1.11.1"
+ureq = "2.12.1"
