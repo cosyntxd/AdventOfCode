@@ -2,7 +2,7 @@ mod runner;
 use runner::{cli,executor, inputs};
 pub fn main() {
     let args = cli::Cli::parse();
-    for f in args.files_parse() {
+    for f in args.files {
         println!("{f:?}");
     }
 
