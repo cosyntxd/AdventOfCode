@@ -1,7 +1,10 @@
 mod runner;
-use runner::{cli,executor, inputs}
+use runner::{cli,executor, inputs};
 pub fn main() {
     let args = cli::Cli::parse();
+    for f in args.files_parse() {
+        println!("{f:?}");
+    }
 
     
     // let rt = tokio::runtime::Builder::new_multi_thread()
