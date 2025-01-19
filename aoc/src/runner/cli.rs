@@ -2,6 +2,8 @@ use std::{env, fs::{self, DirEntry}, iter, path::{Path, PathBuf, MAIN_SEPARATOR}
 
 use regex::Regex;
 
+use super::executor::ExecutionType;
+
 pub struct Cli {
     pub execution: ExecutionType,
     pub files: Vec<PathBuf>,
@@ -50,10 +52,4 @@ impl Cli {
     pub fn help_message() -> &'static str {
         todo!()
     }
-}
-#[derive(PartialEq)]
-pub enum ExecutionType {
-    Run,
-    Bench,
-    Helping,
 }
