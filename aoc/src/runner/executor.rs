@@ -102,15 +102,11 @@ pub struct ExecuteAllSolutions {
 }
 impl ExecuteAllSolutions {
     pub fn new(items: Vec<Executor>, method: ExecutionType) -> Self {
-        Self {
-            items,
-            method,
-        }
+        Self { items, method }
     }
     pub fn run(mut self) {
-        self.items.sort_by(|a,b| {
-            a.day.year.cmp(&b.day.year).then(a.day.day.cmp(&b.day.day))
-        });
+        self.items
+            .sort_by(|a, b| a.day.year.cmp(&b.day.year).then(a.day.day.cmp(&b.day.day)));
 
         match self.method {
             ExecutionType::Run => self.run_bland_verbose(),
@@ -124,9 +120,7 @@ impl ExecuteAllSolutions {
         for item in self.items {
             print!("{}/{:>8}", item.day.year, item.day.day);
             let result = item.run(self.method);
-            if self.method == ExecutionType::Bench {
-
-            } 
+            if self.method == ExecutionType::Bench {}
         }
     }
     // https://www.reddit.com/r/adventofcode/comments/1hlzvvr/10_years_thank_you_eric/

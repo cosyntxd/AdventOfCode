@@ -13,7 +13,7 @@ fn main() {
         let name = entry.file_name().unwrap().to_str().unwrap();
 
         if !name.chars().all(|c| c.is_ascii_digit()) {
-            continue
+            continue;
         }
 
         println!("cargo:warning=Build script completed successfully. {entry:?}");

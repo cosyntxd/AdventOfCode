@@ -1,4 +1,9 @@
-use std::{env, fs::{self, DirEntry}, iter, path::{Path, PathBuf, MAIN_SEPARATOR}};
+use std::{
+    env,
+    fs::{self, DirEntry},
+    iter,
+    path::{Path, PathBuf, MAIN_SEPARATOR},
+};
 
 use regex::Regex;
 
@@ -11,9 +16,7 @@ pub struct Cli {
 impl Cli {
     pub fn parse() -> Self {
         let args: Vec<String> = env::args().collect();
-        let first_arg = args
-            .get(1).map(|str| str.to_string())
-            .unwrap_or_default();
+        let first_arg = args.get(1).map(|str| str.to_string()).unwrap_or_default();
 
         let mut keyword = true;
         let execution = match first_arg.to_lowercase().as_str() {
@@ -35,9 +38,7 @@ impl Cli {
             let mut cdir = PathBuf::new();
             args[files_list_start..args.len()]
                 .iter()
-                .map(|str| {
-                    cdir.join(str)
-                })
+                .map(|str| cdir.join(str))
                 .collect()
         } else {
             vec![]
