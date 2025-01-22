@@ -14,12 +14,13 @@ const TIMEOUT: Duration = Duration::from_secs(1);
 // ew
 type SolutionFunc = dyn Fn() -> Box<dyn ToString>;
 type NanoSec = u128;
+
 pub struct ExecutionResults {
     print: HashSet<String>,
     times_ns: Vec<NanoSec>,
 }
 impl ExecutionResults {
-    pub fn run(func: &SolutionFunc, execution: ExecutionType) -> Self {
+    pub fn run(func: &SolutionFunc, execution: &ExecutionType) -> Self {
         let mut times_ns = Vec::new();
         let start_time = Instant::now();
         let mut function_results = HashSet::new();
@@ -72,41 +73,31 @@ impl ExecutionResults {
     pub fn is_deterministic(&self) -> bool {
         self.print.len() <= 1
     }
-}
-
-pub struct Executor {
-    func: Box<SolutionFunc>,
-    day: InputInfo,
-    results: HashMap<InputInfo, ExecutionResults>,
-}
-impl Executor {
-    pub fn new(func: Box<SolutionFunc>, day: InputInfo) -> Self {
-        Self {
-            func,
-            day,
-            results: HashMap::new(),
+    pub fn get_results(&self) -> String {
+        if self.is_deterministic() {
+            return self.print.iter().next().unwrap().clone()
         }
-    }
-    pub fn run(&self, execution: ExecutionType) -> ExecutionResults {
-        ExecutionResults::run(&self.func, execution)
+        let possible = self.print.iter().cloned().collect::<Vec<_>>().join(", ");
+        format!("{{{}}}", possible)
     }
 }
 pub struct DaySolution {
     part1: Option<Box<SolutionFunc>>,
     part2: Option<Box<SolutionFunc>>,
-    day: InputInfo,
+    date: InputInfo,
 }
+
 pub struct ExecuteAllSolutions {
-    items: Vec<Executor>,
+    days: Vec<DaySolution>,
     method: ExecutionType,
 }
 impl ExecuteAllSolutions {
-    pub fn new(items: Vec<Executor>, method: ExecutionType) -> Self {
-        Self { items, method }
+    pub fn new(items: Vec<DaySolution>, method: ExecutionType) -> Self {
+        Self { days: items, method }
     }
     pub fn run(mut self) {
-        self.items
-            .sort_by(|a, b| a.day.year.cmp(&b.day.year).then(a.day.day.cmp(&b.day.day)));
+        self.days
+            .sort_by(|a, b| a.date.year.cmp(&b.date.year).then(a.date.day.cmp(&b.date.day)));
 
         match self.method {
             ExecutionType::Run => self.run_bland_verbose(),
@@ -116,12 +107,25 @@ impl ExecuteAllSolutions {
     }
     // https://www.reddit.com/r/adventofcode/comments/1hlyocd/500_in_less_than_a_second/
     pub fn run_bland_verbose(self) {
-        assert!(self.method != ExecutionType::Helping);
-        for item in self.items {
-            print!("{}/{:>8}", item.day.year, item.day.day);
-            let result = item.run(self.method);
-            if self.method == ExecutionType::Bench {}
+        let mut total_time = 0;
+        for item in self.days {
+            println!("\x1b[33m{} Day {:>8}:\x1b[0m", item.date.year, item.date.day);
+            print!("Part 1: ");
+            if let Some(part1) = item.part1 {
+                let exec = ExecutionResults::run(&part1, &self.method);
+                total_time += exec.mean();
+                println!("{}", exec.get_results())
+            } else {
+                println!("n/a")
+            }
+            print!("Part 2: ");
+            if let Some(part2) = item.part2 {
+                let exec = ExecutionResults::run(&part2, &self.method);
+                total_time += exec.mean();
+                println!("{}", exec.get_results())
+            }
         }
+        println!("Total time: {}", total_time);
     }
     // https://www.reddit.com/r/adventofcode/comments/1hlzvvr/10_years_thank_you_eric/
     pub fn run_pretty(self) {
@@ -135,3 +139,8 @@ pub enum ExecutionType {
     Bench,
     Helping,
 }
+
+
+
+// 
+
