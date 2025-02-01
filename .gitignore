@@ -3,6 +3,9 @@ Cargo.lock
 target/
 
 aoc/data/
+# autogen for the lsp to fucking index it
+aoc/*/mod.rs
+!aoc/runner/mod.rs
 
 notes/
 .env
