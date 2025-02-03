@@ -1,5 +1,4 @@
-pub fn run() -> (u32, u32) {
-    let input = std::fs::read_to_string("data/day04.txt").unwrap().trim().replace('\r', "");
+pub fn run(input: &String) -> (u32, u32) {
     let data = input.lines().collect::<Vec<&str>>();
 
     let x_off = vec![-1, -1, -1, 0, 0, 1, 1, 1];

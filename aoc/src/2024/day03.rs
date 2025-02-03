@@ -6,8 +6,7 @@ fn mul(n: &str) -> u32 {
     return a.parse::<u32>().unwrap() * b.replace(",", "").parse::<u32>().unwrap();
 }
 
-pub fn run() -> (u32, u32) {
-    let input = std::fs::read_to_string("data/day03.txt").unwrap().trim().replace('\r', "");
+pub fn run(input: &String) -> (u32, u32) {
 
     let pattern = Regex::new(r"mul\((\d{1,3}),(\d{1,3})\)").unwrap();
 

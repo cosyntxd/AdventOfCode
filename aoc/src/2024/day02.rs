@@ -24,8 +24,7 @@ fn safeWR(level: &Vec<i32>) -> bool {
     false
 }
 
-pub fn run() -> (u32, u32) {
-    let input = std::fs::read_to_string("data/day02.txt").unwrap().trim().replace('\r', "");
+pub fn run(input: &String) -> (u32, u32) {
     let mut a1 = 0;
     let mut a2 = 0;
     for line in input.lines() {

@@ -1,13 +1,10 @@
 use std::{
     env,
-    fs::{self, DirEntry},
-    iter,
-    path::{Path, PathBuf, MAIN_SEPARATOR},
+    fs::{self},
+    path::PathBuf,
 };
 
-use regex::Regex;
-
-use super::executor::ExecutionType;
+use super::{executor::ExecutionType, inputs::InputInfo};
 
 pub struct Cli {
     pub execution: ExecutionType,
@@ -35,7 +32,7 @@ impl Cli {
         };
 
         let files = if args.len() > 1 {
-            let mut cdir = PathBuf::new();
+            let cdir = PathBuf::new();
             args[files_list_start..args.len()]
                 .iter()
                 .map(|str| cdir.join(str))
@@ -49,6 +46,36 @@ impl Cli {
         }
 
         Self { execution, files }
+    }
+    pub fn parse_as(self) -> Vec<InputInfo> {
+        self.files
+            .iter()
+            .map(|file| {
+                let file = fs::canonicalize(file).unwrap();
+                let day_num = file
+                    .file_name()
+                    .unwrap()
+                    .to_str()
+                    .unwrap()
+                    .chars()
+                    .filter(|c| c.is_ascii_digit())
+                    .collect::<String>();
+                let year = file
+                    .parent()
+                    .unwrap()
+                    .file_name()
+                    .unwrap()
+                    .to_str()
+                    .unwrap()
+                    .chars()
+                    .filter(|c| c.is_ascii_digit())
+                    .collect::<String>();
+                InputInfo {
+                    year: year.parse().unwrap(),
+                    day: day_num.parse().unwrap(),
+                }
+            })
+            .collect()
     }
     pub fn help_message() -> &'static str {
         todo!()

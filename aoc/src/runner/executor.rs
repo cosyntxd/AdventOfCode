@@ -1,18 +1,18 @@
 use std::{
     collections::{HashMap, HashSet},
+    sync::{Arc, Mutex},
     time::{Duration, Instant},
 };
 
-use ureq::rustls::crypto::KeyExchangeAlgorithm;
-
-use super::inputs::InputInfo;
+use super::inputs::{fetch_data, InputInfo};
 
 const MAX_RUNS: usize = 10_000;
 const MIN_RUNS: usize = 5;
 const TIMEOUT: Duration = Duration::from_secs(1);
 
 // ew
-type SolutionFunc = dyn Fn() -> Box<dyn ToString>;
+type SolutionFunc = dyn Fn(&String) -> (u32, u32);
+type InputStuffText = Arc<Mutex<HashMap<InputInfo, Option<String>>>>;
 type NanoSec = u128;
 
 pub struct ExecutionResults {
@@ -20,7 +20,7 @@ pub struct ExecutionResults {
     times_ns: Vec<NanoSec>,
 }
 impl ExecutionResults {
-    pub fn run(func: &SolutionFunc, execution: &ExecutionType) -> Self {
+    pub fn run(func: &SolutionFunc, execution: &ExecutionType, input: &String) -> Self {
         let mut times_ns = Vec::new();
         let start_time = Instant::now();
         let mut function_results = HashSet::new();
@@ -37,10 +37,10 @@ impl ExecutionResults {
             }
 
             let run_start = Instant::now();
-            let result_new = func();
+            let result_new = func(input);
             times_ns.push(run_start.elapsed().as_nanos() as NanoSec);
 
-            function_results.insert(result_new.to_string());
+            function_results.insert(result_new.0.to_string() + &result_new.1.to_string());
         }
         times_ns.sort_unstable();
         Self {
@@ -75,16 +75,29 @@ impl ExecutionResults {
     }
     pub fn get_results(&self) -> String {
         if self.is_deterministic() {
-            return self.print.iter().next().unwrap().clone()
+            return self.print.iter().next().unwrap().clone();
         }
         let possible = self.print.iter().cloned().collect::<Vec<_>>().join(", ");
         format!("{{{}}}", possible)
     }
 }
+#[derive(Debug)]
 pub struct DaySolution {
-    part1: Option<Box<SolutionFunc>>,
-    part2: Option<Box<SolutionFunc>>,
+    part1: Option<Box<fn(&String) -> (u32, u32)>>,
+    part2: Option<Box<fn(&String) -> (u32, u32)>>,
     date: InputInfo,
+}
+impl DaySolution {
+    pub fn new(date: InputInfo) -> Self {
+        let functions = super::get_list_gen();
+        let year = date.year;
+        let day = date.day;
+        Self {
+            part1: functions.get(&format!("year_{year}_day_{day}")).cloned(),
+            part2: functions.get(&format!("year_{year}_day_{day}")).cloned(),
+            date,
+        }
+    }
 }
 
 pub struct ExecuteAllSolutions {
@@ -93,26 +106,45 @@ pub struct ExecuteAllSolutions {
 }
 impl ExecuteAllSolutions {
     pub fn new(items: Vec<DaySolution>, method: ExecutionType) -> Self {
-        Self { days: items, method }
+        Self {
+            days: items,
+            method,
+        }
     }
     pub fn run(mut self) {
-        self.days
-            .sort_by(|a, b| a.date.year.cmp(&b.date.year).then(a.date.day.cmp(&b.date.day)));
-
+        self.days.sort_by(|a, b| {
+            a.date
+                .year
+                .cmp(&b.date.year)
+                .then(a.date.day.cmp(&b.date.day))
+        });
+        let inputs = fetch_data(self.days.iter().map(|i| i.date).collect());
+        println!("{:?}", self.days);
         match self.method {
-            ExecutionType::Run => self.run_bland_verbose(),
-            ExecutionType::Bench => self.run_pretty(),
+            ExecutionType::Run => self.run_bland_verbose(inputs),
+            // ExecutionType::Bench => self.run_pretty(inputs),
             ExecutionType::Helping => panic!("why are we even here"),
+            _ => {}
         }
     }
     // https://www.reddit.com/r/adventofcode/comments/1hlyocd/500_in_less_than_a_second/
-    pub fn run_bland_verbose(self) {
+    pub fn run_bland_verbose(self, input: InputStuffText) {
         let mut total_time = 0;
         for item in self.days {
-            println!("\x1b[33m{} Day {:>8}:\x1b[0m", item.date.year, item.date.day);
+            let input = input
+                .lock()
+                .unwrap()
+                .get(&item.date)
+                .unwrap()
+                .clone()
+                .unwrap();
+            println!(
+                "\x1b[33m{} Day {:>8}:\x1b[0m",
+                item.date.year, item.date.day
+            );
             print!("Part 1: ");
             if let Some(part1) = item.part1 {
-                let exec = ExecutionResults::run(&part1, &self.method);
+                let exec = ExecutionResults::run(&part1, &self.method, &input);
                 total_time += exec.mean();
                 println!("{}", exec.get_results())
             } else {
@@ -120,7 +152,7 @@ impl ExecuteAllSolutions {
             }
             print!("Part 2: ");
             if let Some(part2) = item.part2 {
-                let exec = ExecutionResults::run(&part2, &self.method);
+                let exec = ExecutionResults::run(&part2, &self.method, &input);
                 total_time += exec.mean();
                 println!("{}", exec.get_results())
             }
@@ -139,8 +171,3 @@ pub enum ExecutionType {
     Bench,
     Helping,
 }
-
-
-
-// 
-

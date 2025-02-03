@@ -1,7 +1,6 @@
 use itertools::Itertools;
 
-pub fn run() -> (i32, i32) {
-    let input = std::fs::read_to_string("data/day05.txt").unwrap().trim().replace('\r', "");
+pub fn run(input: &String) -> (i32, i32) {
     let input_iter = input.lines().collect::<Vec<&str>>();
     let mut orderings = vec![];
     for line in &input_iter {
