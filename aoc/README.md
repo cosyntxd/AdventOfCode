@@ -8,6 +8,9 @@ Advent of Code is an advent calendar for programmers. For 25 days during decembe
 I am trying to restructure everything to be a general comp programming repo so there is only `aoc/`
 
 `src/runner` a fun library that makes solving aoc quicker (spent more time on this than the puzzles)
+
 `src/*` my solutions for that year
+
 `data/` auto downloaded day inputs
+
 `build.rs` black magic to auo generate stuff
